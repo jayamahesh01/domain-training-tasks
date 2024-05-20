@@ -376,3 +376,333 @@ public class CircularQueueBinarySearch {
     }
 }
 
+---------------------------------------------------------------------------------------------------------------------------------
+
+Task 1: Balanced Binary Tree Check
+
+
+Write a function to check if a given binary tree is balanced. A balanced tree is one where the height of two subtrees of any node never differs by more than one.
+
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+
+    TreeNode(int val) {
+        this.val = val;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+public class BinaryTree {
+    
+    public boolean isBalanced(TreeNode root) {
+        return checkHeight(root) != -1;
+    }
+    
+    private int checkHeight(TreeNode node) {
+        if (node == null) {
+            return 0;
+        }
+        
+        int leftHeight = checkHeight(node.left);
+        if (leftHeight == -1) {
+            return -1;
+        }
+        
+        int rightHeight = checkHeight(node.right);
+        if (rightHeight == -1) {
+            return -1;
+        }
+        
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return -1;
+        }
+        
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+
+    public static void main(String[] args) {
+        // Example usage:
+        // Constructing a balanced binary tree
+        //        1
+        //       / \
+        //      2   3
+        //     / \
+        //    4   5
+
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(2);
+        root.right = new TreeNode(3);
+        root.left.left = new TreeNode(4);
+        root.left.right = new TreeNode(5);
+
+        BinaryTree treeChecker = new BinaryTree();
+        System.out.println(treeChecker.isBalanced(root));  // Output: true
+
+        // Constructing an unbalanced binary tree
+        //        1
+        //       /
+        //      2
+        //     /
+        //    3
+        //   /
+        //  4
+        TreeNode unbalancedRoot = new TreeNode(1);
+        unbalancedRoot.left = new TreeNode(2);
+        unbalancedRoot.left.left = new TreeNode(3);
+        unbalancedRoot.left.left.left = new TreeNode(4);
+
+        System.out.println(treeChecker.isBalanced(unbalancedRoot));  // Output: false
+    }
+}
+
+
+ 
+Task 2: Trie for Prefix Checking
+
+
+Implement a trie data structure in C# that supports insertion of strings and provides a method to check if a given string is a prefix of any word in the trie.
+
+class TrieNode {
+    private TrieNode[] children;
+    private boolean isEndOfWord;
+
+    public TrieNode() {
+        children = new TrieNode[26]; // Assuming only lowercase English letters
+        isEndOfWord = false;
+    }
+
+    public boolean containsKey(char ch) {
+        return children[ch - 'a'] != null;
+    }
+
+    public TrieNode get(char ch) {
+        return children[ch - 'a'];
+    }
+
+    public void put(char ch, TrieNode node) {
+        children[ch - 'a'] = node;
+    }
+
+    public void setEndOfWord() {
+        isEndOfWord = true;
+    }
+
+    public boolean isEndOfWord() {
+        return isEndOfWord;
+    }
+}
+
+public class Trie {
+    private TrieNode root;
+
+    public Trie() {
+        root = new TrieNode();
+    }
+
+    public void insert(String word) {
+        TrieNode node = root;
+        for (char ch : word.toCharArray()) {
+            if (!node.containsKey(ch)) {
+                node.put(ch, new TrieNode());
+            }
+            node = node.get(ch);
+        }
+        node.setEndOfWord();
+    }
+
+    public boolean isPrefix(String prefix) {
+        TrieNode node = root;
+        for (char ch : prefix.toCharArray()) {
+            if (node.containsKey(ch)) {
+                node = node.get(ch);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Trie trie = new Trie();
+        
+        // Insert words into the trie
+        trie.insert("apple");
+        trie.insert("app");
+        trie.insert("apricot");
+        trie.insert("banana");
+
+        // Check prefixes
+        System.out.println(trie.isPrefix("app")); // Output: true
+        System.out.println(trie.isPrefix("apr")); // Output: true
+        System.out.println(trie.isPrefix("ban")); // Output: true
+        System.out.println(trie.isPrefix("bat")); // Output: false
+    }
+}
+
+
+ 
+Task 3: Implementing Heap Operations
+
+
+Code a min-heap in java with methods for insertion, deletion, and fetching the minimum element. Ensure that the heap property is maintained after each operation."
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MinHeap {
+    private List<Integer> heap;
+
+    public MinHeap() {
+        heap = new ArrayList<>();
+    }
+
+    public void insert(int value) {
+        heap.add(value);
+        int currentIndex = heap.size() - 1;
+        while (currentIndex > 0) {
+            int parentIndex = (currentIndex - 1) / 2;
+            if (heap.get(currentIndex) < heap.get(parentIndex)) {
+                swap(currentIndex, parentIndex);
+                currentIndex = parentIndex;
+            } else {
+                break;
+            }
+        }
+    }
+
+    public int deleteMin() {
+        if (heap.isEmpty()) {
+            throw new IllegalStateException("Heap is empty");
+        }
+        int minValue = heap.get(0);
+        heap.set(0, heap.get(heap.size() - 1));
+        heap.remove(heap.size() - 1);
+        heapifyDown(0);
+        return minValue;
+    }
+
+    public int getMin() {
+        if (heap.isEmpty()) {
+            throw new IllegalStateException("Heap is empty");
+        }
+        return heap.get(0);
+    }
+
+    private void heapifyDown(int index) {
+        int leftChild = 2 * index + 1;
+        int rightChild = 2 * index + 2;
+        int smallest = index;
+
+        if (leftChild < heap.size() && heap.get(leftChild) < heap.get(smallest)) {
+            smallest = leftChild;
+        }
+
+        if (rightChild < heap.size() && heap.get(rightChild) < heap.get(smallest)) {
+            smallest = rightChild;
+        }
+
+        if (smallest != index) {
+            swap(index, smallest);
+            heapifyDown(smallest);
+        }
+    }
+
+    private void swap(int i, int j) {
+        int temp = heap.get(i);
+        heap.set(i, heap.get(j));
+        heap.set(j, temp);
+    }
+
+    public static void main(String[] args) {
+        MinHeap minHeap = new MinHeap();
+        minHeap.insert(5);
+        minHeap.insert(3);
+        minHeap.insert(8);
+        minHeap.insert(1);
+        minHeap.insert(10);
+
+        System.out.println("Min element: " + minHeap.getMin());
+
+        minHeap.deleteMin();
+        System.out.println("Min element after deletion: " + minHeap.getMin());
+    }
+}
+
+ 
+Task 4: Graph Edge Addition Validation
+
+
+Given a directed graph, write a function that adds an edge between two nodes and then checks if the graph still has no cycles. If a cycle is created, the edge should not be added.
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class DirectedGraph {
+    private int V; // Number of vertices
+    private List<List<Integer>> adjList; // Adjacency list representation of the graph
+
+    public DirectedGraph(int V) {
+        this.V = V;
+        adjList = new ArrayList<>(V);
+        for (int i = 0; i < V; i++) {
+            adjList.add(new ArrayList<>());
+        }
+    }
+
+    public void addEdge(int u, int v) {
+        adjList.get(u).add(v);
+    }
+
+    public boolean hasCycleAfterAddingEdge(int u, int v) {
+        addEdge(u, v); // Add the new edge
+
+        Set<Integer> visited = new HashSet<>();
+        Set<Integer> recursionStack = new HashSet<>();
+
+        for (int i = 0; i < V; i++) {
+            if (hasCycleUtil(i, visited, recursionStack)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasCycleUtil(int vertex, Set<Integer> visited, Set<Integer> recursionStack) {
+        if (recursionStack.contains(vertex)) {
+            return true; // Cycle detected
+        }
+
+        if (visited.contains(vertex)) {
+            return false; // Already visited, no cycle
+        }
+
+        visited.add(vertex);
+        recursionStack.add(vertex);
+
+        for (int neighbor : adjList.get(vertex)) {
+            if (hasCycleUtil(neighbor, visited, recursionStack)) {
+                return true;
+            }
+        }
+
+        recursionStack.remove(vertex); // Backtrack
+        return false;
+    }
+
+    public static void main(String[] args) {
+        DirectedGraph graph = new DirectedGraph(4);
+        graph.addEdge(0, 1);
+        graph.addEdge(1, 2);
+        graph.addEdge(2, 3);
+        System.out.println("Graph has cycle before adding edge: " + graph.hasCycleAfterAddingEdge(3, 0));
+        System.out.println("Graph has cycle after adding edge: " + graph.hasCycleAfterAddingEdge(3, 0));
+    }
+}
+
