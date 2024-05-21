@@ -1,0 +1,128 @@
+5.//////////////
+
+import java.util.*;
+
+public class GraphTraversal {
+    
+    private int vertices; // Number of vertices
+    private LinkedList<Integer>[] adjList; // Adjacency list
+
+    // Constructor to initialize the graph
+    public GraphTraversal(int v) {
+        vertices = v;
+        adjList = new LinkedList[vertices];
+        for (int i = 0; i < vertices; ++i)
+            adjList[i] = new LinkedList<>();
+    }
+
+    // Method to add an edge to the graph
+    void addEdge(int v, int w) {
+        adjList[v].add(w);
+        adjList[w].add(v); // As the graph is undirected
+    }
+
+    // Method to perform BFS traversal from a given source node
+    void BFS(int startNode) {
+        boolean[] visited = new boolean[vertices]; // Track visited nodes
+        LinkedList<Integer> queue = new LinkedList<>(); // BFS uses a queue
+        
+        visited[startNode] = true; // Mark the start node as visited
+        queue.add(startNode); // Enqueue the start node
+        
+        while (!queue.isEmpty()) {
+            // Dequeue a vertex from the queue and print it
+            int node = queue.poll();
+            System.out.print(node + " ");
+            
+            // Get all adjacent vertices of the dequeued vertex node
+            Iterator<Integer> i = adjList[node].listIterator();
+            while (i.hasNext()) {
+                int adjacentNode = i.next();
+                if (!visited[adjacentNode]) {
+                    visited[adjacentNode] = true; // Mark this node as visited
+                    queue.add(adjacentNode); // Enqueue the node
+                }
+            }
+        }
+    }
+
+    // Main method to test the BFS traversal
+    public static void main(String[] args) {
+        GraphTraversal graph = new GraphTraversal(6);
+        
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(1, 4);
+        graph.addEdge(2, 4);
+        graph.addEdge(3, 5);
+        graph.addEdge(4, 5);
+        
+        System.out.println("BFS traversal starting from node 0:");
+        graph.BFS(0);
+    }
+}
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+6. 
+
+
+import java.util.*;
+
+public class RecursiveDFS {
+
+    private int vertices; // Number of vertices
+    private LinkedList<Integer>[] adjList; // Adjacency list
+
+    // Constructor to initialize the graph
+    public RecursiveDFS(int v) {
+        vertices = v;
+        adjList = new LinkedList[vertices];
+        for (int i = 0; i < vertices; ++i)
+            adjList[i] = new LinkedList<>();
+    }
+
+    // Method to add an edge to the graph
+    void addEdge(int v, int w) {
+        adjList[v].add(w);
+        adjList[w].add(v); // As the graph is undirected
+    }
+
+    // Recursive DFS function
+    void DFSUtil(int v, boolean[] visited) {
+        // Mark the current node as visited and print it
+        visited[v] = true;
+        System.out.print(v + " ");
+
+        // Recur for all the vertices adjacent to this vertex
+        for (int adj : adjList[v]) {
+            if (!visited[adj]) {
+                DFSUtil(adj, visited);
+            }
+        }
+    }
+
+    // DFS traversal function
+    void DFS(int startNode) {
+        boolean[] visited = new boolean[vertices]; // Array to mark visited nodes
+        DFSUtil(startNode, visited); // Call the recursive helper function
+    }
+
+    // Main method to test the DFS traversal
+    public static void main(String[] args) {
+        RecursiveDFS graph = new RecursiveDFS(6);
+        
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(1, 4);
+        graph.addEdge(2, 4);
+        graph.addEdge(3, 5);
+        graph.addEdge(4, 5);
+        
+        System.out.println("DFS traversal starting from node 0:");
+        graph.DFS(0);
+    }
+}
