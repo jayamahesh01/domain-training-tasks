@@ -1,0 +1,275 @@
+[09:58] Maria (Unverified)
+
+Find if graph contains cycles : 
+
+package com.graph;
+ 
+public class UnionFind {
+  int[] parent, rank;
+ 
+	// Initialize the parent and rank arrays
+	public UnionFind(int n) {
+    	parent = new int[n];
+    	rank = new int[n];
+    	for (int i = 0; i < n; i++) {
+        	parent[i] = i;
+        	rank[i] = 0;
+    	}
+	}
+ 
+	// Find the root of the set containing x
+	public int find(int x) {
+    	if (parent[x] != x) {
+        	parent[x] = find(parent[x]);  // Path compression
+    	}
+    	return parent[x];
+	}
+ 
+	// Union by rank of the sets containing x and y
+	public void union(int x, int y) {
+    	int rootX = find(x);
+    	int rootY = find(y);
+ 
+    	if (rootX != rootY) {
+        	if (rank[rootX] > rank[rootY]) {
+            	parent[rootY] = rootX;
+        	} else if (rank[rootX] < rank[rootY]) {
+            	parent[rootX] = rootY;
+        	} else {
+            	parent[rootY] = rootX;
+            	rank[rootX]++;
+        	}
+    	}
+	}
+ 
+	// Method to detect cycle in an undirected graph
+	public boolean hasCycle(int[][] edges) {
+    	for (int[] edge : edges) {
+        	int u = edge[0];
+        	int v = edge[1];
+ 
+        	int rootU = find(u);
+        	int rootV = find(v);
+ 
+        	if (rootU == rootV) {
+            	return true;
+        	}
+ 
+        	union(u, v);
+    	}
+    	return false;
+	}
+  public static void main(String[] args) {
+    int[][] edges = { { 0, 1 }, { 1, 2 }, { 2, 0 } };  // Example graph with a cycle
+    	UnionFind uf = new UnionFind(3);
+ 
+    	if (uf.hasCycle(edges)) {
+        	System.out.println("Graph contains a cycle");
+    	} else {
+        	System.out.println("Graph does not contain a cycle");
+    	}
+ 
+  }
+ 
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Task 1: Dijkstra’s Shortest Path Finder
+Code Dijkstra’s algorithm to find the shortest path from a start node to every other node in a weighted graph with positive weights.
+import java.util.*;
+
+public class DijkstraAlgorithm {
+
+    // Node class representing each vertex and its distance from the source
+    static class Node implements Comparable<Node> {
+        int vertex;
+        int distance;
+
+        Node(int vertex, int distance) {
+            this.vertex = vertex;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return Integer.compare(this.distance, other.distance);
+        }
+    }
+
+    // Method to find the shortest paths from the source to all vertices
+    public static void dijkstra(int[][] graph, int source) {
+        int numVertices = graph.length;
+        int[] distances = new int[numVertices];
+        boolean[] visited = new boolean[numVertices];
+
+        // Initialize distances with infinity and visited array as false
+        Arrays.fill(distances, Integer.MAX_VALUE);
+        distances[source] = 0;
+
+        // Priority queue to select the vertex with the smallest distance
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.add(new Node(source, 0));
+
+        while (!pq.isEmpty()) {
+            Node currentNode = pq.poll();
+            int currentVertex = currentNode.vertex;
+
+            // Skip the vertex if it has already been visited
+            if (visited[currentVertex]) continue;
+            visited[currentVertex] = true;
+
+            // Update the distances to the neighboring vertices
+            for (int neighbor = 0; neighbor < numVertices; neighbor++) {
+                int weight = graph[currentVertex][neighbor];
+                if (weight > 0 && !visited[neighbor]) {
+                    int newDist = distances[currentVertex] + weight;
+                    if (newDist < distances[neighbor]) {
+                        distances[neighbor] = newDist;
+                        pq.add(new Node(neighbor, newDist));
+                    }
+                }
+            }
+        }
+
+        // Print the shortest distances from the source to each vertex
+        System.out.println("Vertex \t\t Distance from Source");
+        for (int i = 0; i < numVertices; i++) {
+            System.out.println(i + " \t\t " + distances[i]);
+        }
+    }
+
+    public static void main(String[] args) {
+        // Example graph represented as an adjacency matrix
+        int[][] graph = {
+            {0, 10, 0, 0, 0, 0},
+            {10, 0, 5, 0, 0, 15},
+            {0, 5, 0, 20, 0, 0},
+            {0, 0, 20, 0, 10, 0},
+            {0, 0, 0, 10, 0, 5},
+            {0, 15, 0, 0, 5, 0}
+        };
+        
+        int source = 0;  // Starting node
+        dijkstra(graph, source);
+    }
+}
+
+
+ Task 2: Union-Find for Cycle Detection
+Write a Union-Find data structure with path compression. Use this data structure to detect a cycle in an undirected graph.
+import java.util.*;
+
+public class UnionFindCycleDetection {
+
+    // Union-Find class with path compression
+    static class UnionFind {
+        private int[] parent;
+        private int[] rank;
+
+        public UnionFind(int size) {
+            parent = new int[size];
+            rank = new int[size];
+            for (int i = 0; i < size; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        // Find function with path compression
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]); // Path compression
+            }
+            return parent[x];
+        }
+
+        // Union function with union by rank
+        public boolean union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX == rootY) {
+                return false; // Cycle detected
+            }
+
+            if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY;
+            } else {
+                parent[rootY] = rootX;
+                rank[rootX]++;
+            }
+
+            return true;
+        }
+    }
+
+    // Graph class to detect cycle using Union-Find
+    static class Graph {
+        private int numVertices;
+        private List<int[]> edges;
+
+        public Graph(int numVertices) {
+            this.numVertices = numVertices;
+            this.edges = new ArrayList<>();
+        }
+
+        // Add an edge to the graph
+        public void addEdge(int u, int v) {
+            edges.add(new int[]{u, v});
+        }
+
+        // Detect cycle using Union-Find
+        public boolean hasCycle() {
+            UnionFind uf = new UnionFind(numVertices);
+
+            for (int[] edge : edges) {
+                int u = edge[0];
+                int v = edge[1];
+
+                if (!uf.union(u, v)) {
+                    return true; // Cycle detected
+                }
+            }
+
+            return false; // No cycle detected
+        }
+    }
+
+    public static void main(String[] args) {
+        Graph graph = new Graph(5);
+
+        graph.addEdge(0, 1);
+        graph.addEdge(1, 2);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 4);
+        graph.addEdge(4, 1); // This edge creates a cycle
+
+        if (graph.hasCycle()) {
+            System.out.println("The graph contains a cycle.");
+        } else {
+            System.out.println("The graph does not contain a cycle.");
+        }
+    }
+}
+
+
+
+
+
