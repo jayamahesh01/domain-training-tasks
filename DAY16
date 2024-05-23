@@ -1,1 +1,197 @@
+1. Implement Kruskal’s algorithm to find the minimum spanning tree of a given connected, undirected graph with non-negative edge weights
+
+import java.util.*;
+
+class Edge implements Comparable<Edge> {
+    int src, dest, weight;
+
+    public Edge(int src, int dest, int weight) {
+        this.src = src;
+        this.dest = dest;
+        this.weight = weight;
+    }
+
+    @Override
+    public int compareTo(Edge compareEdge) {
+        return this.weight - compareEdge.weight;
+    }
+}
+
+class Graph {
+    int V, E;
+    Edge[] edges;
+
+    public Graph(int v, int e) {
+        V = v;
+        E = e;
+        edges = new Edge[E];
+        for (int i = 0; i < e; ++i)
+            edges[i] = new Edge(0, 0, 0);
+    }
+
+    int find(int[] parent, int i) {
+        if (parent[i] == i)
+            return i;
+        return find(parent, parent[i]);
+    }
+
+    void union(int[] parent, int[] rank, int x, int y) {
+        int xroot = find(parent, x);
+        int yroot = find(parent, y);
+
+        if (rank[xroot] < rank[yroot])
+            parent[xroot] = yroot;
+        else if (rank[xroot] > rank[yroot])
+            parent[yroot] = xroot;
+        else {
+            parent[yroot] = xroot;
+            rank[xroot]++;
+        }
+    }
+
+    void kruskalMST() {
+        Edge[] result = new Edge[V];
+        int e = 0;
+        int i = 0;
+        for (i = 0; i < V; ++i)
+            result[i] = new Edge(0, 0, 0);
+
+        Arrays.sort(edges);
+
+        int[] parent = new int[V];
+        int[] rank = new int[V];
+
+        for (int v = 0; v < V; ++v) {
+            parent[v] = v;
+            rank[v] = 0;
+        }
+
+        i = 0;
+
+        while (e < V - 1) {
+            Edge next_edge = edges[i++];
+            int x = find(parent, next_edge.src);
+            int y = find(parent, next_edge.dest);
+
+            if (x != y) {
+                result[e++] = next_edge;
+                union(parent, rank, x, y);
+            }
+        }
+
+        System.out.println("Following are the edges in the constructed MST:");
+        for (i = 0; i < e; ++i)
+            System.out.println(result[i].src + " -- " + result[i].dest + " == " + result[i].weight);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        int V = 4;
+        int E = 5;
+        Graph graph = new Graph(V, E);
+
+        // Add edge 0-1
+        graph.edges[0] = new Edge(0, 1, 10);
+
+        // Add edge 0-2
+        graph.edges[1] = new Edge(0, 2, 6);
+
+        // Add edge 0-3
+        graph.edges[2] = new Edge(0, 3, 5);
+
+        // Add edge 1-3
+        graph.edges[3] = new Edge(1, 3, 15);
+
+        // Add edge 2-3
+        graph.edges[4] = new Edge(2, 3, 4);
+
+        graph.kruskalMST();
+    }
+}
+
+
+2. 
+Write a method that takes two strings, concatenates them, reverses the
+
+result, and then extracts the middle substring of the given length. 
+
+
+Ensure your method handles edge cases, such as an empty string or a 
+
+
+substring length larger than the concatenated string.
+
+
+public class MiddleSubstringExtractor {
+    
+    public static String extractMiddleSubstring(String str1, String str2, int length) {
+        // Concatenate the two strings
+        String concatenated = str1 + str2;
+        
+        // Check if the concatenated string is empty or if the length is larger than the concatenated string
+        if (concatenated.isEmpty() || length > concatenated.length()) {
+            return "Invalid input";
+        }
+        
+        // Reverse the concatenated string
+        String reversed = new StringBuilder(concatenated).reverse().toString();
+        
+        // Calculate the starting index of the middle substring
+        int startIndex = (reversed.length() - length) / 2;
+        
+        // Extract the middle substring
+        String middleSubstring = reversed.substring(startIndex, startIndex + length);
+        
+        return middleSubstring;
+    }
+
+    public static void main(String[] args) {
+        // Test cases
+        System.out.println(extractMiddleSubstring("Hello", "World", 3)); // Expected output: "rWo"
+        System.out.println(extractMiddleSubstring("Hello", "", 2)); // Expected output: "l"
+        System.out.println(extractMiddleSubstring("", "World", 4)); // Expected output: "ldro"
+        System.out.println(extractMiddleSubstring("", "", 5)); // Expected output: "Invalid input"
+        System.out.println(extractMiddleSubstring("Hello", "World", 10)); // Expected output: "Invalid input"
+    }
+}
+
+
+3. Implement the naive pattern searching algorithm to find all occurrences
+of a pattern within a given text string. Count the number of comparisons
+made during the search to evaluate the efficiency of the algorithm.
+
+
+public class NaivePatternSearch {
+    
+    public static void searchPattern(String text, String pattern) {
+        int textLength = text.length();
+        int patternLength = pattern.length();
+        int comparisons = 0;
+
+        // Iterate through the text
+        for (int i = 0; i <= textLength - patternLength; i++) {
+            int j;
+
+            // Match pattern with text starting at position i
+            for (j = 0; j < patternLength; j++) {
+                comparisons++;
+                if (text.charAt(i + j) != pattern.charAt(j))
+                    break;
+            }
+            // If the whole pattern is found at the current position, print its index
+            if (j == patternLength)
+                System.out.println("Pattern found at index " + i);
+        }
+        System.out.println("Total comparisons made: " + comparisons);
+    }
+
+    public static void main(String[] args) {
+        String text = "AABAACAADAABAAABAA";
+        String pattern = "AABA";
+        System.out.println("Text: " + text);
+        System.out.println("Pattern: " + pattern);
+        searchPattern(text, pattern);
+    }
+}
 
