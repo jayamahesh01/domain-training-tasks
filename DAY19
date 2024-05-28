@@ -223,6 +223,11 @@ takes a list of jobs and returns the maximum profit sequence of jobs
 that can be done before the deadlines. Use the greedy method to solve
 this problem.
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 class Job {
     int id;
     int deadline;
@@ -239,15 +244,6 @@ class Job {
         return "Job{id=" + id + ", deadline=" + deadline + ", profit=" + profit + "}";
     }
 }
-
-
-
-—---------------------------------------------
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class JobSequencing {
 
@@ -313,7 +309,6 @@ public class JobSequencing {
         }
     }
 }
-
 
 
 
