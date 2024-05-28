@@ -1,0 +1,72 @@
+Task 1: Bit Manipulation Basics
+Create a function that counts the number of set bits (1s) in the binary representation of an integer. Extend this to count the total number of set bits in all integers from 1 to n.
+
+public class BitManipulationBasics {
+
+    public static void main(String[] args) {
+        int number = 19;
+        System.out.println("Number of set bits in " + number + ": " + countSetBits(number));
+
+        int n = 5;
+        System.out.println("Total number of set bits from 1 to " + n + ": " + countTotalSetBits(n));
+    }
+
+    public static int countSetBits(int number) {
+        int count = 0;
+        while (number > 0) {
+            count += number & 1;
+            number >>= 1;
+        }
+        return count;
+    }
+
+    public static int countTotalSetBits(int n) {
+        int totalSetBits = 0;
+        for (int i = 1; i <= n; i++) {
+            totalSetBits += countSetBits(i);
+        }
+        return totalSetBits;
+    }
+}
+
+
+
+Task 2: Unique Elements Identification
+
+
+
+My solution :
+
+ public class FindTwoNonRepeatingElements {
+
+    public static void main(String[] args) {
+        int[] arr = {2, 4, 7, 9, 2, 4, 6, 9};
+        int[] result = findTwoNonRepeatingElements(arr);
+        System.out.println("The two non-repeating elements are: " + result[0] + " and " + result[1]);
+    }
+
+    public static int[] findTwoNonRepeatingElements(int[] arr) {
+        int xor = 0;
+
+        // Step 1: XOR all elements to get xor of the two non-repeating elements
+        for (int i = 0; i < arr.length; i++) {
+            xor ^= arr[i];
+        }
+
+        // Step 2: Find a set bit (we use the rightmost set bit)
+        int setBit = xor & -xor; // This isolates the rightmost set bit
+
+        // Step 3 and 4: Partition the array into two groups and find the two unique numbers
+        int x = 0, y = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if ((arr[i] & setBit) == 0) {
+                x ^= arr[i]; // XOR of first group
+            } else {
+                y ^= arr[i]; // XOR of second group
+            }
+        }
+
+        return new int[]{x, y};
+    }
+}
+
