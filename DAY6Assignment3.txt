@@ -1,0 +1,22 @@
+Feature Branches and Hotfixes
+
+**Create a 'hotfix' branch to fix an issue:
+
+git checkout main
+git branch hotfix
+git checkout hotfix
+**Make the necessary changes to fix the issue:
+
+echo "Hotfix applied." >> hello.txt
+Add and commit the hotfix:
+
+git add hello.txt
+git commit -m "Applied hotfix to hello.txt"
+
+**Merge the 'hotfix' branch into 'main':
+
+git checkout main
+git merge hotfix
+Ensure the issue is resolved (you can review the file to confirm):
+
+cat hello.txt

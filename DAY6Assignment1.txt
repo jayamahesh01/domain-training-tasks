@@ -1,0 +1,16 @@
+Initialize a New Git Repository and Make the First Commit
+
+Initialize a new Git repository:
+
+mkdir my_project
+cd my_project
+git init
+Add a simple text file:
+
+echo "Hello, Git!" > hello.txt
+Add the file to the repository:
+
+git add hello.txt
+Make the first commit:
+
+git commit -m "Initial commit: Added hello.txt"
