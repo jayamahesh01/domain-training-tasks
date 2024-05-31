@@ -1,0 +1,253 @@
+1...   N-QUEEN
+
+public class NQueenProblem {
+    
+    static final int N = 8; // Standard 8x8 chessboard
+
+    // Function to print the solution
+    void printSolution(int board[][]) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(" " + board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    // Function to check if a queen can be placed on board[row][col]
+    boolean isSafe(int board[][], int row, int col) {
+        int i, j;
+
+        // Check this row on the left side
+        for (i = 0; i < col; i++) {
+            if (board[row][i] == 1)
+                return false;
+        }
+
+        // Check the upper diagonal on the left side
+        for (i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        // Check the lower diagonal on the left side
+        for (i = row, j = col; j >= 0 && i < N; i++, j--) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    // Function to solve the N-Queens problem using backtracking
+    boolean solveNQueen(int board[][], int col) {
+        // Base case: If all queens are placed, return true
+        if (col >= N) {
+            return true;
+        }
+
+        // Consider this column and try placing the queen in all rows one by one
+        for (int i = 0; i < N; i++) {
+            // Check if placing the queen at board[i][col] is safe
+            if (isSafe(board, i, col)) {
+                // Place the queen
+                board[i][col] = 1;
+
+                // Recur to place the rest of the queens
+                if (solveNQueen(board, col + 1)) {
+                    return true;
+                }
+
+                // If placing the queen at board[i][col] doesn't lead to a solution, then backtrack
+                board[i][col] = 0; // Remove the queen
+            }
+        }
+
+        // If the queen cannot be placed in any row in this column, return false
+        return false;
+    }
+
+    // Function to solve the N-Queens problem
+    boolean solve() {
+        int board[][] = new int[N][N];
+
+        if (!solveNQueen(board, 0)) {
+            System.out.println("Solution does not exist");
+            return false;
+        }
+
+        printSolution(board);
+        return true;
+    }
+
+    public static void main(String[] args) {
+        NQueenProblem Queen = new NQueenProblem();
+        Queen.solve();
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2.. RAT MAZE
+
+public class RatInMaze {
+    
+    static final int N = 6; // Size of the maze
+
+    // Function to print the solution
+    void printSolution(int sol[][]) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(" " + sol[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    // Utility function to check if x, y is valid index for N*N maze
+    boolean isSafe(int maze[][], int x, int y) {
+        // Return true if x, y is in bounds and maze[x][y] is 1
+        return (x >= 0 && x < N && y >= 0 && y < N && maze[x][y] == 1);
+    }
+
+    // Solves the Maze problem using backtracking
+    boolean solveMaze(int maze[][]) {
+        int sol[][] = new int[N][N]; // Solution matrix
+
+        if (!solveMazeUtil(maze, 0, 0, sol)) {
+            System.out.println("Solution doesn't exist");
+            return false;
+        }
+
+        printSolution(sol);
+        return true;
+    }
+
+    // Utility function to solve Maze problem
+    boolean solveMazeUtil(int maze[][], int x, int y, int sol[][]) {
+        // If x, y is the goal, return true
+        if (x == N - 1 && y == N - 1 && maze[x][y] == 1) {
+            sol[x][y] = 1;
+            return true;
+        }
+
+        // Check if maze[x][y] is valid
+        if (isSafe(maze, x, y)) {
+            // Mark x, y as part of the solution path
+            sol[x][y] = 1;
+
+            // Move forward in the x direction
+            if (solveMazeUtil(maze, x + 1, y, sol))
+                return true;
+
+            // If moving in x direction doesn't give solution,
+            // then move down in the y direction
+            if (solveMazeUtil(maze, x, y + 1, sol))
+                return true;
+
+            // If none of the above movements work, BACKTRACK:
+            // Unmark x, y as part of solution path
+            sol[x][y] = 0;
+            return false;
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+        RatInMaze rat = new RatInMaze();
+        int maze[][] = {
+            {1, 0, 0, 0, 0, 0},
+            {1, 1, 0, 1, 1, 0},
+            {0, 1, 0, 1, 0, 0},
+            {1, 1, 1, 1, 0, 1},
+            {0, 0, 0, 1, 1, 1},
+            {0, 0, 0, 0, 0, 1}
+        };
+        rat.solveMaze(maze);
+    }
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. KNIGHT'S TOUR
+
+public class KnightsTour {
+    
+    static final int N = 8; // Size of the chessboard
+
+    // Utility function to check if x, y is valid index for N*N chessboard
+    boolean isSafe(int x, int y, int board[][]) {
+        return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] == -1);
+    }
+
+    // Function to print the solution
+    void printSolution(int board[][]) {
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                System.out.print(board[x][y] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    // This function solves the Knight's Tour problem using Backtracking.
+    boolean solveKnightsTour() {
+        int board[][] = new int[N][N];
+
+        // Initialization of the solution matrix
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                board[x][y] = -1;
+            }
+        }
+
+        // xMove[] and yMove[] define next move of Knight.
+        // xMove[] is for next value of x coordinate
+        // yMove[] is for next value of y coordinate
+        int xMove[] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+        int yMove[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+        // Since the Knight is initially at the first block
+        board[0][0] = 0;
+
+        // Start from 0,0 and explore all tours using solveKnightsTourUtil()
+        if (!solveKnightsTourUtil(0, 0, 1, board, xMove, yMove)) {
+            System.out.println("Solution does not exist");
+            return false;
+        } else {
+            printSolution(board);
+        }
+
+        return true;
+    }
+
+    // A recursive utility function to solve Knight Tour problem
+    boolean solveKnightsTourUtil(int x, int y, int moveCount, int board[][], int xMove[], int yMove[]) {
+        int k, nextX, nextY;
+        if (moveCount == N * N) {
+            return true;
+        }
+
+        // Try all next moves from the current coordinate x, y
+        for (k = 0; k < 8; k++) {
+            nextX = x + xMove[k];
+            nextY = y + yMove[k];
+            if (isSafe(nextX, nextY, board)) {
+                board[nextX][nextY] = moveCount;
+                if (solveKnightsTourUtil(nextX, nextY, moveCount + 1, board, xMove, yMove)) {
+                    return true;
+                } else {
+                    board[nextX][nextY] = -1; // backtracking
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+        KnightsTour knightTour = new KnightsTour();
+        knightTour.solveKnightsTour();
+    }
+}
