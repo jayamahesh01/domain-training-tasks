@@ -1,0 +1,278 @@
+1. Number Printing Thread
+
+public class NumberPrintingThreads {
+    public static void main(String[] args) {
+        Runnable printNumbers = () -> {
+            for (int i = 1; i <= 10; i++) {
+                System.out.println(Thread.currentThread().getName() + ": " + i);
+                try {
+                    Thread.sleep(1000); // 1-second delay
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread thread1 = new Thread(printNumbers, "Thread 1");
+        Thread thread2 = new Thread(printNumbers, "Thread 2");
+
+        thread1.start();
+        thread2.start();
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+2. states and transitions
+
+class ThreadLifecycleDemo {
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(() -> {
+            try {
+                System.out.println("Thread State: " + Thread.currentThread().getState()); // RUNNABLE
+                synchronized (ThreadLifecycleDemo.class) {
+                    ThreadLifecycleDemo.class.wait(1000); // WAITING
+                }
+                Thread.sleep(500); // TIMED_WAITING
+                synchronized (ThreadLifecycleDemo.class) {
+                    ThreadLifecycleDemo.class.notify();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        System.out.println("Thread State: " + thread.getState()); // NEW
+        thread.start();
+        Thread.sleep(200); // Allow thread to start
+        System.out.println("Thread State: " + thread.getState()); // RUNNABLE
+        synchronized (ThreadLifecycleDemo.class) {
+            ThreadLifecycleDemo.class.notify(); // Ensure main thread holds the monitor
+            Thread.sleep(100); // Make main thread wait and release monitor
+        }
+        thread.join(); // TERMINATED
+        System.out.println("Thread State: " + thread.getState()); // TERMINATED
+    }
+}
+
+-----------------------------------------------------------------------------------------------------
+
+3.Synchronization and Inter-thread Communication
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+class ProducerConsumer {
+    private static final int CAPACITY = 5;
+    private final Queue<Integer> queue = new LinkedList<>();
+
+    public static void main(String[] args) {
+        ProducerConsumer pc = new ProducerConsumer();
+        Thread producerThread = new Thread(pc::produce);
+        Thread consumerThread = new Thread(pc::consume);
+
+        producerThread.start();
+        consumerThread.start();
+    }
+
+    public void produce() {
+        int value = 0;
+        while (true) {
+            synchronized (this) {
+                while (queue.size() == CAPACITY) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                queue.offer(value++);
+                System.out.println("Produced " + value);
+                notify();
+            }
+        }
+    }
+
+    public void consume() {
+        while (true) {
+            synchronized (this) {
+                while (queue.isEmpty()) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                int value = queue.poll();
+                System.out.println("Consumed " + value);
+                notify();
+            }
+        }
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------
+4.Synchronized Blocks and Methods
+
+class BankAccount {
+    private int balance = 1000;
+
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount();
+        Thread t1 = new Thread(() -> account.deposit(200));
+        Thread t2 = new Thread(() -> account.withdraw(150));
+        Thread t3 = new Thread(() -> account.withdraw(50));
+
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+
+    public synchronized void deposit(int amount) {
+        balance += amount;
+        System.out.println("Deposited " + amount + ", Balance: " + balance);
+    }
+
+    public synchronized void withdraw(int amount) {
+        if (balance >= amount) {
+            balance -= amount;
+            System.out.println("Withdrew " + amount + ", Balance: " + balance);
+        } else {
+            System.out.println("Insufficient balance to withdraw " + amount);
+        }
+    }
+}
+
+-------------------------------------------------------------------------------------------------------------
+5.Thread Pools and Concurrency Utilities
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+class ThreadPoolDemo {
+
+    public static void main(String[] args) {
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        for (int i = 0; i < 10; i++) {
+            executor.submit(() -> {
+                try {
+                    Thread.sleep(500);
+                    System.out.println("Task executed by " + Thread.currentThread().getName());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+        executor.shutdown();
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------
+6.Executors, Concurrent Collections, CompletableFuture
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+class PrimeCalculator {
+
+    public static void main(String[] args) {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+
+        CompletableFuture.supplyAsync(() -> calculatePrimes(10000), executor)
+                .thenAcceptAsync(primes -> {
+                    try {
+                        Files.write(Paths.get("primes.txt"), primes);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }, executor).thenRun(executor::shutdown);
+    }
+
+    private static List<String> calculatePrimes(int max) {
+        return IntStream.rangeClosed(2, max)
+                .filter(PrimeCalculator::isPrime)
+                .mapToObj(Integer::toString)
+                .collect(Collectors.toList());
+    }
+
+    private static boolean isPrime(int number) {
+        return IntStream.rangeClosed(2, (int) Math.sqrt(number))
+                .allMatch(n -> number % n != 0);
+    }
+}
+
+--------------------------------------------------------------------------------------------------------------------
+7.Writing Thread-Safe Code, Immutable Objects
+
+class Counter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+
+    public synchronized void decrement() {
+        count--;
+    }
+
+    public synchronized int getCount() {
+        return count;
+    }
+
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+        Runnable task = () -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+                counter.decrement();
+            }
+        };
+
+        Thread t1 = new Thread(task);
+        Thread t2 = new Thread(task);
+        t1.start();
+        t2.start();
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Final count: " + counter.getCount());
+    }
+}
+
+final class ImmutableData {
+    private final int value;
+
+    public ImmutableData(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static void main(String[] args) {
+        ImmutableData data = new ImmutableData(42);
+        Runnable task = () -> System.out.println("Value: " + data.getValue());
+
+        Thread t1 = new Thread(task);
+        Thread t2 = new Thread(task);
+        t1.start();
+        t2.start();
+    }
+}
+
+
